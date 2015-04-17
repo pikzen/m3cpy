@@ -41,7 +41,7 @@ namespace M3Cpy
                 {"h|?|help", v => flags.ShowHelp   = (v != null)},
                 {"rm",       v => flags.TryErase   = (v != null)},
                 {"v|verbose",v => flags.Verbose    = (v != null)},
-                {"replace",v => flags.Overwrite    = (v != null)}
+                {"replace",  v => flags.Overwrite    = (v != null)}
             };
             opt.Parse(args);            
 
@@ -192,7 +192,7 @@ Options:
          -f, --m3u: Path to m3u file.
          -o, --out: Path to output folder.
                -rm: Attempt to remove the original once it has been copied.
-         --replace: Do not replace the file if it already exists.
+         --replace: Replace the file if it already exists.
     -h, -?, --help: Display help.
       -v,--verbose: Toggle verbose mode.");
         }
