@@ -22,6 +22,7 @@
 
 using System;
 using System.IO;
+using System.Security.AccessControl;
 using System.Web;
 
 namespace M3Cpy
@@ -108,6 +109,14 @@ namespace M3Cpy
         /// <returns></returns>
         static bool HandleSingleFile(string line, M3CpyFlags settings)
         {
+            string log = "";
+            // Remove file:/// URIs because File.Copy chokes on them.
+            string file = HttpUtility.UrlDecode(line).Replace("file:///", "")
+                                                     .Replace("file://", "");
+            FileInfo finfo = new FileInfo(file);
+            string fullpath = settings.OutputPath + finfo.Name;
+
+            // ========================================================================================================
             // File.Copy does not handle http:// links, and we don't want to support them.
             // TODO: support them ?
             if (line.StartsWith("http://"))
@@ -116,13 +125,6 @@ namespace M3Cpy
                 return false;
             }
 
-            string log = "";
-            // Remove file:/// URIs because File.Copy chokes on them.
-            string file = HttpUtility.UrlDecode(line).Replace("file:///", "")
-                                                     .Replace("file://", "");
-            FileInfo finfo = new FileInfo(file);
-            string fullpath = settings.OutputPath + finfo.Name;
-
             // Check for an already existing file in case the user does not want to overwrite
             // Otherwise, File.Copy throws an IOException if we don't overwrite.
             if (File.Exists(fullpath) && !settings.Overwrite)
@@ -130,14 +132,46 @@ namespace M3Cpy
                 Console.WriteLine("{0} already exists, skipping (ow is {1})", finfo.Name, settings.Overwrite);
                 return true; // Consider it as a success, we can assume it's gonna be 99% of the time.
             }
+            
+            // ========================================================================================================
+            // Attempt to copy. We'll handle the two most likely exceptions (don't have the right to read or plain old
+            // IO error. Everything else is truly crash territory and should stop anyways.
+            try
+            {
+                File.Copy(file, fullpath, settings.Overwrite);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                if (settings.Verbose) Console.WriteLine("Not authorized to copy {0}", finfo.Name);
+                return false;
+            }
+            catch (IOException ex)
+            {
+                if (settings.Verbose) Console.WriteLine("Unknown error on {0} ({1})", finfo.Name, ex.Message);
+                return false;
+            }
 
-            File.Copy(file, fullpath, settings.Overwrite);
+
             log += (String.Format("{0} copied", finfo.Name));
 
             // Deletes the original if the user wants to.
             if (settings.TryErase)
             {
-                File.Delete(file);
+                // Once again, try to delete and check both most likely exceptions.
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    if (settings.Verbose) Console.WriteLine("Not authorized to delete {0}", finfo.Name);
+                    return false;
+                }
+                catch (IOException ex)
+                {
+                    if (settings.Verbose) Console.WriteLine("Error on {0} ({1})", finfo.Name, ex.Message);
+                    return false;
+                }
                 log += ", deleted";
             }
 
