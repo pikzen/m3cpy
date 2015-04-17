@@ -1,0 +1,6 @@
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\bin\Debug\m3cpy.exe.config
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\bin\Debug\m3cpy.exe
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\bin\Debug\m3cpy.pdb
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\obj\Debug\m3cpy.csprojResolveAssemblyReference.cache
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\obj\Debug\m3cpy.exe
+c:\users\pikzen\documents\visual studio 2015\Projects\m3cpy\m3cpy\obj\Debug\m3cpy.pdb
