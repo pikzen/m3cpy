@@ -19,3 +19,6 @@ Options:
  * Does not support http:// URIs, nor any URI but file:// in fact. 
  * Should handle and warn you about filesystem rights issues
  * Not tested on GNU/Linux. The biggest issue might be that the required .Net assembly is 4.5, but Mono should handle it.
+
+## License
+m3cpy is licensed under the MIT License.
